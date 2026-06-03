@@ -266,8 +266,8 @@
         </div>
         <div class="card-body">
           <div class="att-controls">
-            <button class="quick-btn active" id="qbtn-week" onclick="setQuick('week', this)">This week</button>
-            <button class="quick-btn" id="qbtn-month" onclick="setQuick('month', this)">This month</button>
+           <button class="quick-btn active" id="qbtn-week" onclick="setQuick('week', this)">Today</button>
+            <button class="quick-btn" id="qbtn-month" onclick="setQuick('month', this)">Last 30 days</button>
             <button class="quick-btn" id="qbtn-60" onclick="setQuick('60days', this)">Last 60 days</button>
             <span class="att-sep">or</span>
             <input type="date" id="att-start">
@@ -457,12 +457,10 @@ function setQuick(range, btn) {
   const now = new Date();
   let start, end;
   if (range === "week") {
-    const day = now.getDay(); // 0=Sun
-    const diff = day === 0 ? 6 : day - 1; // Mon=0
-    start = new Date(now); start.setDate(now.getDate() - diff);
+    start = new Date(now);
     end = new Date(now);
   } else if (range === "month") {
-    start = new Date(now.getFullYear(), now.getMonth(), 1);
+    start = new Date(now); start.setDate(now.getDate() - 29);
     end = new Date(now);
   } else {
     start = new Date(now); start.setDate(now.getDate() - 59);
