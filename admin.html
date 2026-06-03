@@ -78,23 +78,13 @@
   }
   .card-body { padding: 1rem 1.25rem; }
 
-  .presence-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 0.4rem;
-  }
-  .presence-item {
-    display: flex; align-items: center; gap: 0.6rem;
-    font-size: 0.88rem; padding: 0.3rem 0;
-  }
+  .presence-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.4rem; }
+  .presence-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.88rem; padding: 0.3rem 0; }
   .presence-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .presence-dot.in  { background: var(--green); }
   .presence-dot.out { background: #ccc; }
   .presence-item.out { color: var(--muted); }
-  .presence-summary {
-    margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted);
-    border-top: 1px solid var(--border); padding-top: 0.75rem;
-  }
+  .presence-summary { margin-top: 0.75rem; font-size: 0.82rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 0.75rem; }
 
   .note-row { display: flex; gap: 0.75rem; align-items: flex-start; }
   .note-row textarea {
@@ -125,6 +115,44 @@
   }
   .load-btn:hover { background: #701515; }
 
+  /* ATTENDANCE */
+  .att-controls {
+    display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;
+  }
+  .att-controls input[type="date"] {
+    border: 1px solid var(--border); border-radius: 4px; padding: 0.45rem 0.7rem;
+    font-family: 'Roboto', sans-serif; font-size: 0.85rem; outline: none; background: #fff;
+  }
+  .att-controls input[type="date"]:focus { border-color: var(--red); }
+  .quick-btn {
+    background: #fff; border: 1px solid var(--border); border-radius: 4px;
+    padding: 0.45rem 0.85rem; font-family: 'Roboto', sans-serif;
+    font-size: 0.82rem; color: var(--text); cursor: pointer; font-weight: 500;
+  }
+  .quick-btn:hover { border-color: var(--red); color: var(--red); }
+  .quick-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+  .att-sep { color: var(--muted); font-size: 0.82rem; }
+
+  .att-table-wrap { overflow-x: auto; }
+  .att-table {
+    width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 400px;
+  }
+  .att-table th {
+    text-align: left; font-weight: 700; font-size: 0.72rem;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+    padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .att-table th.date-col { text-align: center; }
+  .att-table td {
+    padding: 0.5rem 0.75rem; border-bottom: 1px solid #f0f0f0;
+  }
+  .att-table tr:last-child td { border-bottom: none; }
+  .att-table td.date-cell { text-align: center; }
+  .att-tick { color: var(--green); font-size: 1.1rem; font-weight: 700; }
+  .att-cross { color: #ccc; font-size: 1rem; }
+  .att-summary { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+
   table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
   th {
     text-align: left; font-weight: 700; font-size: 0.75rem;
@@ -146,8 +174,7 @@
   .session-note-display {
     font-size: 0.85rem; color: var(--muted); font-style: italic;
     margin-bottom: 0.75rem; padding: 0.6rem 0.75rem;
-    background: #fafafa; border-left: 3px solid var(--border);
-    border-radius: 0 4px 4px 0;
+    background: #fafafa; border-left: 3px solid var(--border); border-radius: 0 4px 4px 0;
   }
 
   .empty-msg { color: var(--muted); font-size: 0.88rem; padding: 0.5rem 0; font-style: italic; }
@@ -174,6 +201,7 @@
     <a href="index.html" style="display:block;margin-top:1rem;font-size:0.82rem;color:var(--muted);text-decoration:none;">&#8592; Exit Admin Mode</a>
   </div>
 </div>
+
 <div id="admin-screen" style="display:none;">
   <header>
     <div class="header-left">
@@ -190,8 +218,10 @@
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('today', this)">Today</button>
       <button class="tab-btn" onclick="showTab('history', this)">History</button>
+      <button class="tab-btn" onclick="showTab('attendance', this)">Attendance</button>
     </div>
 
+    <!-- TODAY -->
     <div class="tab-panel active" id="tab-today">
       <div class="card">
         <div class="card-header">Who's here now</div>
@@ -209,6 +239,7 @@
       </div>
     </div>
 
+    <!-- HISTORY -->
     <div class="tab-panel" id="tab-history">
       <div class="card">
         <div class="card-header">
@@ -225,6 +256,29 @@
         </div>
       </div>
     </div>
+
+    <!-- ATTENDANCE -->
+    <div class="tab-panel" id="tab-attendance">
+      <div class="card">
+        <div class="card-header">
+          <span>Attendance</span>
+          <button class="export-btn" onclick="exportAttCSV()">Export CSV</button>
+        </div>
+        <div class="card-body">
+          <div class="att-controls">
+            <button class="quick-btn active" id="qbtn-week" onclick="setQuick('week', this)">This week</button>
+            <button class="quick-btn" id="qbtn-month" onclick="setQuick('month', this)">This month</button>
+            <span class="att-sep">or</span>
+            <input type="date" id="att-start">
+            <span class="att-sep">to</span>
+            <input type="date" id="att-end">
+            <button class="load-btn" onclick="loadAttendance()">Load</button>
+          </div>
+          <div id="att-body"><div class="loading-msg">Loading...</div></div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -232,6 +286,7 @@
 <script>
 let choristers = [];
 let historyRows = [];
+let attData = null;
 
 async function doLogin() {
   const pw = document.getElementById("pw-input").value;
@@ -264,10 +319,20 @@ function todayStr() {
   return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
 
+function dateStr(d) {
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+
+function formatDisplayDate(str) {
+  const d = new Date(str + "T00:00:00");
+  return d.toLocaleDateString("en-GB", { day:"numeric", month:"short" });
+}
+
 async function initAdmin() {
   document.getElementById("hdr-date").textContent =
     new Date().toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
   document.getElementById("hist-date").value = todayStr();
+  setQuick("week", document.getElementById("qbtn-week"));
 
   try {
     const [cRes, sRes, nRes] = await Promise.all([
@@ -281,9 +346,10 @@ async function initAdmin() {
     renderPresence(todayStatus);
     if (sessionData.notes) document.getElementById("note-input").value = sessionData.notes;
   } catch (e) {
-    document.getElementById("presence-body").innerHTML =
-      '<div class="empty-msg">Could not load data.</div>';
+    document.getElementById("presence-body").innerHTML = '<div class="empty-msg">Could not load data.</div>';
   }
+
+  loadAttendance();
 }
 
 function renderPresence(statusList) {
@@ -332,7 +398,6 @@ async function loadHistory() {
   const histBody = document.getElementById("hist-body");
   histBody.innerHTML = '<div class="loading-msg">Loading...</div>';
   document.getElementById("hist-note-display").style.display = "none";
-
   try {
     const [logRes, noteRes] = await Promise.all([
       fetch(CONFIG.API_URL + "?action=log&date=" + date),
@@ -340,18 +405,15 @@ async function loadHistory() {
     ]);
     historyRows = await logRes.json();
     const noteData = await noteRes.json();
-
     if (noteData.notes) {
       const nd = document.getElementById("hist-note-display");
       nd.textContent = "Note: " + noteData.notes;
       nd.style.display = "block";
     }
-
     if (!historyRows.length) {
       histBody.innerHTML = '<div class="empty-msg">No entries for this date.</div>';
       return;
     }
-
     const table = document.createElement("table");
     table.innerHTML = '<thead><tr><th>Time</th><th>Name</th><th>Action</th><th>Late</th></tr></thead>';
     const tbody = document.createElement("tbody");
@@ -383,7 +445,128 @@ function exportCSV() {
   const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(",")).join("\n");
   const a = document.createElement("a");
   a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-  a.download = "choir-attendance-" + document.getElementById("hist-date").value + ".csv";
+  a.download = "choir-log-" + document.getElementById("hist-date").value + ".csv";
+  a.click();
+}
+
+// ATTENDANCE
+function setQuick(range, btn) {
+  document.querySelectorAll(".quick-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const now = new Date();
+  let start, end;
+  if (range === "week") {
+    const day = now.getDay(); // 0=Sun
+    const diff = day === 0 ? 6 : day - 1; // Mon=0
+    start = new Date(now); start.setDate(now.getDate() - diff);
+    end = new Date(now);
+  } else {
+    start = new Date(now.getFullYear(), now.getMonth(), 1);
+    end = new Date(now);
+  }
+  document.getElementById("att-start").value = dateStr(start);
+  document.getElementById("att-end").value = dateStr(end);
+}
+
+// clear quick button highlight when user manually changes dates
+["att-start","att-end"].forEach(id => {
+  document.getElementById(id).addEventListener("change", () => {
+    document.querySelectorAll(".quick-btn").forEach(b => b.classList.remove("active"));
+  });
+});
+
+async function loadAttendance() {
+  const start = document.getElementById("att-start").value;
+  const end   = document.getElementById("att-end").value;
+  if (!start || !end) return;
+  const body = document.getElementById("att-body");
+  body.innerHTML = '<div class="loading-msg">Loading...</div>';
+
+  try {
+    const res = await fetch(CONFIG.API_URL + "?action=attendance&start=" + start + "&end=" + end);
+    attData = await res.json();
+    renderAttendance();
+  } catch (e) {
+    body.innerHTML = '<div class="empty-msg">Could not load attendance.</div>';
+  }
+}
+
+function renderAttendance() {
+  const body = document.getElementById("att-body");
+  if (!attData || !attData.dates || !attData.dates.length) {
+    body.innerHTML = '<div class="empty-msg">No sessions found in this range.</div>';
+    return;
+  }
+
+  const { dates, names, attended } = attData;
+
+  const wrap = document.createElement("div");
+  wrap.className = "att-table-wrap";
+
+  const table = document.createElement("table");
+  table.className = "att-table";
+
+  // header row
+  const thead = document.createElement("thead");
+  const hrow = document.createElement("tr");
+  hrow.innerHTML = '<th>Name</th>';
+  dates.forEach(d => {
+    const th = document.createElement("th");
+    th.className = "date-col";
+    th.textContent = formatDisplayDate(d);
+    hrow.appendChild(th);
+  });
+  hrow.innerHTML += '<th style="text-align:center;">Total</th>';
+  thead.appendChild(hrow);
+  table.appendChild(thead);
+
+  // body rows
+  const tbody = document.createElement("tbody");
+  names.forEach(name => {
+    const tr = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    nameCell.textContent = name;
+    tr.appendChild(nameCell);
+    let total = 0;
+    dates.forEach(d => {
+      const td = document.createElement("td");
+      td.className = "date-cell";
+      const present = attended[name] && attended[name][d];
+      if (present) { total++; td.innerHTML = '<span class="att-tick">&#10003;</span>'; }
+      else         { td.innerHTML = '<span class="att-cross">&#10005;</span>'; }
+      tr.appendChild(td);
+    });
+    const totalCell = document.createElement("td");
+    totalCell.className = "date-cell";
+    totalCell.innerHTML = '<span class="att-summary">' + total + '/' + dates.length + '</span>';
+    tr.appendChild(totalCell);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  body.innerHTML = "";
+  body.appendChild(wrap);
+}
+
+function exportAttCSV() {
+  if (!attData || !attData.dates || !attData.dates.length) { alert("Load attendance first."); return; }
+  const { dates, names, attended } = attData;
+  const rows = [["Name", ...dates.map(formatDisplayDate), "Total"]];
+  names.forEach(name => {
+    const row = [name];
+    let total = 0;
+    dates.forEach(d => {
+      const present = attended[name] && attended[name][d];
+      if (present) total++;
+      row.push(present ? "Yes" : "No");
+    });
+    row.push(total + "/" + dates.length);
+    rows.push(row);
+  });
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = "choir-attendance-" + document.getElementById("att-start").value + "-to-" + document.getElementById("att-end").value + ".csv";
   a.click();
 }
 </script>
