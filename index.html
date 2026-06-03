@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Choir Register</title>
+<link rel="icon" href="StPeterFavicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -30,66 +31,86 @@
   .header-text h1 { font-size: 1.2rem; font-weight: 700; color: var(--red); }
   .header-text .subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 1px; }
 
-  main { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; }
-
-  .loading { text-align: center; padding: 4rem 0; color: var(--muted); font-size: 0.9rem; }
-
-  .columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
+  main {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
   }
-  .col { background: #fff; border: 1px solid var(--border); }
-  .col:first-child { border-radius: 8px 0 0 8px; border-right: none; }
-  .col:last-child  { border-radius: 0 8px 8px 0; }
 
-  .col-header {
-    padding: 0.9rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    font-size: 1rem;
+  /* MODE SELECT */
+  #mode-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .mode-btn {
+    width: 100%;
+    padding: 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
     font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .mode-btn:hover { opacity: 0.9; }
+  .mode-btn.signin  { background: var(--green); color: #fff; }
+  .mode-btn.signout { background: var(--red);   color: #fff; }
+
+  /* NAME LIST */
+  #list-screen { display: none; }
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 0 0 1rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
   }
-  .col-header.sign-in  { color: var(--green); }
-  .col-header.sign-out { color: var(--red); }
-  .col-header .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .col-header.sign-in  .dot { background: var(--green); }
-  .col-header.sign-out .dot { background: var(--red); }
-
-  .col-body { padding: 0.5rem 0; }
-
+  .back-btn:hover { color: var(--text); }
+  .list-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+  }
+  .names-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
   .name-btn {
     display: block;
     width: 100%;
     background: none;
     border: none;
+    border-bottom: 1px solid var(--border);
     text-align: left;
-    padding: 0.6rem 1.25rem;
+    padding: 0.85rem 1.25rem;
     font-family: 'Roboto', sans-serif;
-    font-size: 0.92rem;
+    font-size: 1rem;
     font-weight: 400;
     color: var(--text);
     cursor: pointer;
-    border-left: 3px solid transparent;
-    transition: background 0.1s, border-color 0.1s;
+    border-left: 4px solid transparent;
+    transition: background 0.1s;
   }
-  .col:first-child .name-btn:hover {
-    background: var(--green-light);
-    border-left-color: var(--green);
-    color: var(--green);
-    font-weight: 500;
-  }
-  .col:last-child .name-btn:hover {
-    background: var(--red-light);
-    border-left-color: var(--red);
-    color: var(--red);
-    font-weight: 500;
-  }
+  .name-btn:last-child { border-bottom: none; }
+  .name-btn.signin-mode:hover  { background: var(--green-light); border-left-color: var(--green); color: var(--green); font-weight: 500; }
+  .name-btn.signout-mode:hover { background: var(--red-light);   border-left-color: var(--red);   color: var(--red);   font-weight: 500; }
   .name-btn.busy { opacity: 0.4; pointer-events: none; }
+  .empty-msg { padding: 1.25rem; font-size: 0.9rem; color: var(--muted); font-style: italic; }
 
-  .empty-msg { padding: 1.25rem; font-size: 0.85rem; color: var(--muted); font-style: italic; }
+  .loading-msg { text-align: center; padding: 3rem 0; color: var(--muted); font-size: 0.9rem; }
 
   .toast {
     position: fixed;
@@ -100,7 +121,7 @@
     color: #fff;
     padding: 0.55rem 1.2rem;
     border-radius: 4px;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     opacity: 0;
     transition: opacity 0.2s;
     pointer-events: none;
@@ -131,12 +152,6 @@
     font-size: 0.88rem;
     margin-bottom: 1rem;
   }
-
-  @media (max-width: 560px) {
-    .columns { grid-template-columns: 1fr; }
-    .col:first-child { border-radius: 8px 8px 0 0; border-right: 1px solid var(--border); border-bottom: none; }
-    .col:last-child  { border-radius: 0 0 8px 8px; }
-  }
 </style>
 </head>
 <body>
@@ -150,17 +165,18 @@
 </header>
 
 <main>
-  <div class="loading" id="loading">Loading register...</div>
   <div id="error-area"></div>
-  <div class="columns" id="columns" style="display:none;">
-    <div class="col">
-      <div class="col-header sign-in"><span class="dot"></span>Sign In</div>
-      <div class="col-body" id="list-in"></div>
-    </div>
-    <div class="col">
-      <div class="col-header sign-out"><span class="dot"></span>Sign Out</div>
-      <div class="col-body" id="list-out"></div>
-    </div>
+  <div class="loading-msg" id="loading">Loading...</div>
+
+  <div id="mode-screen">
+    <button class="mode-btn signin"  onclick="showList('in')">Sign In</button>
+    <button class="mode-btn signout" onclick="showList('out')">Sign Out</button>
+  </div>
+
+  <div id="list-screen">
+    <button class="back-btn" onclick="showMode()">&#8592; Back</button>
+    <div class="list-heading" id="list-heading"></div>
+    <div class="names-card" id="names-card"></div>
   </div>
 </main>
 
@@ -171,12 +187,13 @@
 <script>
 let choristers = [];
 let statusMap = {};
+let currentMode = null;
 
 document.getElementById("hdr-date").textContent =
   new Date().toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
 
-function sorted(list) {
-  return list.slice().sort((a, b) => a.name.localeCompare(b.name));
+function showError(msg) {
+  document.getElementById("error-area").innerHTML = '<div class="error-box">' + msg + '</div>';
 }
 
 function showToast(msg, late) {
@@ -186,35 +203,50 @@ function showToast(msg, late) {
   setTimeout(() => { el.className = "toast" + (late ? " late" : ""); }, 2500);
 }
 
-function showError(msg) {
-  document.getElementById("error-area").innerHTML = '<div class="error-box">' + msg + '</div>';
+function showMode() {
+  document.getElementById("list-screen").style.display = "none";
+  document.getElementById("mode-screen").style.display = "flex";
+  currentMode = null;
 }
 
-function renderLists() {
-  const inEl  = document.getElementById("list-in");
-  const outEl = document.getElementById("list-out");
-  inEl.innerHTML = "";
-  outEl.innerHTML = "";
+function showList(mode) {
+  currentMode = mode;
+  document.getElementById("mode-screen").style.display = "none";
+  document.getElementById("list-screen").style.display = "block";
+  renderList();
+}
 
-  const out = sorted(choristers.filter(c => (statusMap[c.name] || "out") === "out"));
-  const inn = sorted(choristers.filter(c => statusMap[c.name] === "in"));
+function renderList() {
+  const card = document.getElementById("names-card");
+  const heading = document.getElementById("list-heading");
+  card.innerHTML = "";
 
-  if (!out.length) {
-    inEl.innerHTML = '<div class="empty-msg">Everyone is signed in.</div>';
+  if (currentMode === "in") {
+    heading.textContent = "Who's signing in?";
+    const people = choristers
+      .filter(c => (statusMap[c.name] || "out") === "out")
+      .sort((a,b) => a.name.localeCompare(b.name));
+    if (!people.length) {
+      card.innerHTML = '<div class="empty-msg">Everyone is already signed in.</div>';
+    } else {
+      people.forEach(c => card.appendChild(makeBtn(c, "signin-mode")));
+    }
   } else {
-    out.forEach(c => inEl.appendChild(makeBtn(c)));
-  }
-
-  if (!inn.length) {
-    outEl.innerHTML = '<div class="empty-msg">Nobody signed in yet.</div>';
-  } else {
-    inn.forEach(c => outEl.appendChild(makeBtn(c)));
+    heading.textContent = "Who's signing out?";
+    const people = choristers
+      .filter(c => statusMap[c.name] === "in")
+      .sort((a,b) => a.name.localeCompare(b.name));
+    if (!people.length) {
+      card.innerHTML = '<div class="empty-msg">Nobody is currently signed in.</div>';
+    } else {
+      people.forEach(c => card.appendChild(makeBtn(c, "signout-mode")));
+    }
   }
 }
 
-function makeBtn(c) {
+function makeBtn(c, modeClass) {
   const btn = document.createElement("button");
-  btn.className = "name-btn";
+  btn.className = "name-btn " + modeClass;
   btn.textContent = c.name;
   btn.addEventListener("click", () => toggle(c, btn));
   return btn;
@@ -222,8 +254,7 @@ function makeBtn(c) {
 
 async function toggle(chorister, btn) {
   btn.classList.add("busy");
-  const current = statusMap[chorister.name] || "out";
-  const newAction = current === "in" ? "out" : "in";
+  const newAction = currentMode === "in" ? "in" : "out";
   try {
     const res = await fetch(CONFIG.API_URL, {
       method: "POST",
@@ -238,9 +269,13 @@ async function toggle(chorister, btn) {
     const data = await res.json();
     if (data.success) {
       statusMap[chorister.name] = newAction;
-      renderLists();
       const first = chorister.name.split(" ")[0];
-      showToast(first + (newAction === "in" ? (data.late ? " signed in (late)" : " signed in") : " signed out"), newAction === "in" && data.late);
+      if (newAction === "in") {
+        showToast(first + (data.late ? " signed in (late)" : " signed in"), data.late);
+      } else {
+        showToast(first + " signed out", false);
+      }
+      renderList();
     } else {
       showError("Something went wrong. Please try again.");
       btn.classList.remove("busy");
@@ -261,13 +296,16 @@ async function init() {
     const today = await sRes.json();
     today.forEach(s => { statusMap[s.name] = s.status; });
     document.getElementById("loading").style.display = "none";
-    document.getElementById("columns").style.display = "grid";
-    renderLists();
+    document.getElementById("mode-screen").style.display = "flex";
   } catch (e) {
     document.getElementById("loading").style.display = "none";
     showError("Could not load register. Check CONFIG.API_URL in config.js.");
   }
 }
+
+// hide both screens until loaded
+document.getElementById("mode-screen").style.display = "none";
+document.getElementById("list-screen").style.display = "none";
 
 init();
 </script>
