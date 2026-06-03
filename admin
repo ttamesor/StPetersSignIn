@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choir Register - Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #8b1a1a;
+    --red-light: #f7eeee;
+    --border: #e0e0e0;
+    --text: #1a1a1a;
+    --muted: #757575;
+    --green: #2e7d32;
+    --green-light: #f1f8f1;
+    --bg: #f5f5f5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* LOGIN */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    width: 320px;
+    text-align: center;
+  }
+  .login-box img { width: 56px; margin-bottom: 1rem; }
+  .login-box h2 { font-size: 1.1rem; font-weight: 700; color: var(--red); margin-bottom: 0.25rem; }
+  .login-box p { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.25rem; }
+  .login-box input {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.92rem;
+    margin-bottom: 0.75rem;
+    outline: none;
+  }
+  .login-box input:focus { border-color: var(--red); }
+  .login-box button {
+    width: 100%;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.65rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .login-box button:hover { background: #701515; }
+  .login-error { color: var(--red); font-size: 0.82rem; margin-top: 0.5rem; }
+
+  /* HEADER */
+  header {
+    background: #fff;
+    border-bottom: 2px solid var(--red);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: center; gap: 1rem; }
+  header img { width: 44px; height: 44px; object-fit: contain; }
+  .header-text h1 { font-size: 1.1rem; font-weight: 700; color: var(--red); }
+  .header-text .subtitle { font-size: 0.8rem; color: var(--muted); margin-top: 1px; }
+  .logout-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.4rem 0.9rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* MAIN */
+  main { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    padding: 0.6rem 1.25rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+  }
+  .card-header {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-body { padding: 1rem 1.25rem; }
+
+  /* WHO'S HERE */
+  .presence-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+  }
+  .presence-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+    padding: 0.4rem 0;
+  }
+  .presence-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .presence-dot.in  { background: var(--green); }
+  .presence-dot.out { background: #ccc; }
+  .presence-item.out { color: var(--muted); }
+  .vp-section { margin-bottom: 1rem; }
+  .vp-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  /* SESSION NOTE */
+  .note-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+  .note-row textarea {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.6rem 0.8rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.88rem;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+  }
+  .note-row textarea:focus { border-color: var(--red); }
+  .save-btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1.1rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .save-btn:hover { background: #701515; }
+  .save-btn:disabled { opacity: 0.5; pointer-events: none; }
+  .note-saved { font-size: 0.8rem; color: var(--green); margin-top: 0.4rem; }
+
+  /* HISTORY */
+  .history-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .history-controls input[type="date"],
+  .history-controls select {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    background: #fff;
+  }
+  .history-controls input[type="date"]:focus,
+  .history-controls select:focus { border-color: var(--red); }
+  .load-btn {
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .load-btn:hover { background: #701515; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th {
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .badge.in  { background: var(--green-light); color: var(--green); }
+  .badge.out { background: #f5f5f5; color: var(--muted); }
+  .badge.late { background: #fff3e0; color: #e65100; }
+
+  .session-note-display {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    background: #fafafa;
+    border-left: 3px solid var(--border);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .empty-msg { color: var(--muted); font-size: 0.88rem; padding: 0.5rem 0; font-style: italic; }
+
+  .export-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.45rem 0.9rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .export-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .loading-msg { color: var(--muted); font-size: 0.88rem; padding: 1rem 0; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-box">
+    <img src="Graphic_-_Master.png" alt="Choir crest">
+    <h2>Admin Access</h2>
+    <p>Choir Register</p>
+    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+    <button onclick="doLogin()">Sign in</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen" style="display:none;">
+
+  <header>
+    <div class="header-left">
+      <img src="Graphic_-_Master.png" alt="Choir crest">
+      <div class="header-text">
+        <h1>Choir Register - Admin</h1>
+        <div class="subtitle" id="hdr-date"></div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Sign out</button>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('today', this)">Today</button>
+      <button class="tab-btn" onclick="showTab('history', this)">History</button>
+    </div>
+
+    <!-- TODAY TAB -->
+    <div class="tab-panel active" id="tab-today">
+
+      <div class="card">
+        <div class="card-header">Who's here now</div>
+        <div class="card-body" id="presence-body">
+          <div class="loading-msg">Loading...</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Session note</div>
+        <div class="card-body">
+          <div class="note-row">
+            <textarea id="note-input" placeholder="e.g. Pre-concert rehearsal, visiting conductor..."></textarea>
+            <button class="save-btn" id="note-save-btn" onclick="saveNote()">Save</button>
+          </div>
+          <div class="note-saved" id="note-saved" style="display:none;">Saved.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div class="tab-panel" id="tab-history">
+
+      <div class="card">
+        <div class="card-header">
+          <span>Attendance log</span>
+          <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+        </div>
+        <div class="card-body">
+          <div class="history-controls">
+            <input type="date" id="hist-date">
+            <select id="hist-vp">
+              <option value="">All voice parts</option>
+              <option value="S">Soprano</option>
+              <option value="A">Alto</option>
+              <option value="T">Tenor</option>
+              <option value="B">Bass</option>
+            </select>
+            <button class="load-btn" onclick="loadHistory()">Load</button>
+          </div>
+          <div id="hist-note-display" style="display:none;" class="session-note-display"></div>
+          <div id="hist-body"><div class="empty-msg">Select a date and click Load.</div></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="config.js"></script>
+<script>
+const VOICE_ORDER = ["S","A","T","B"];
+const VOICE_NAMES = { S:"Soprano", A:"Alto", T:"Tenor", B:"Bass" };
+
+let choristers = [];
+let historyRows = [];
+
+// LOGIN
+async function doLogin() {
+  const pw = document.getElementById("pw-input").value;
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
+  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+  if (hash === CONFIG.ADMIN_PASSWORD_HASH) {
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("admin-screen").style.display = "block";
+    initAdmin();
+  } else {
+    document.getElementById("login-error").textContent = "Incorrect password.";
+  }
+}
+document.getElementById("pw-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") doLogin();
+});
+function doLogout() {
+  document.getElementById("admin-screen").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("pw-input").value = "";
+}
+
+// TABS
+function showTab(name, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  btn.classList.add("active");
+}
+
+// INIT
+async function initAdmin() {
+  document.getElementById("hdr-date").textContent =
+    new Date().toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+
+  // set history date to today
+  const today = new Date();
+  const pad = n => String(n).padStart(2,"0");
+  document.getElementById("hist-date").value =
+    today.getFullYear() + "-" + pad(today.getMonth()+1) + "-" + pad(today.getDate());
+
+  try {
+    const [cRes, sRes, nRes] = await Promise.all([
+      fetch(CONFIG.API_URL + "?action=choristers"),
+      fetch(CONFIG.API_URL + "?action=today"),
+      fetch(CONFIG.API_URL + "?action=session&date=" + todayStr())
+    ]);
+    choristers = await cRes.json();
+    const todayStatus = await sRes.json();
+    const sessionData = await nRes.json();
+
+    renderPresence(todayStatus);
+    if (sessionData.notes) document.getElementById("note-input").value = sessionData.notes;
+  } catch (e) {
+    document.getElementById("presence-body").innerHTML =
+      '<div class="empty-msg">Could not load data. Check API_URL in config.js.</div>';
+  }
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + "-" +
+    String(d.getMonth()+1).padStart(2,"0") + "-" +
+    String(d.getDate()).padStart(2,"0");
+}
+
+function renderPresence(statusList) {
+  const el = document.getElementById("presence-body");
+  el.innerHTML = "";
+  const map = {};
+  statusList.forEach(s => { map[s.name] = s.status; });
+
+  let totalIn = 0;
+  VOICE_ORDER.forEach(vp => {
+    const group = choristers.filter(c => c.voice_part === vp);
+    if (!group.length) return;
+    const section = document.createElement("div");
+    section.className = "vp-section";
+    const lbl = document.createElement("div");
+    lbl.className = "vp-label";
+    lbl.textContent = VOICE_NAMES[vp];
+    section.appendChild(lbl);
+    const grid = document.createElement("div");
+    grid.className = "presence-grid";
+    group.forEach(c => {
+      const isIn = (map[c.name] || "out") === "in";
+      if (isIn) totalIn++;
+      const item = document.createElement("div");
+      item.className = "presence-item" + (isIn ? "" : " out");
+      item.innerHTML = '<span class="presence-dot ' + (isIn ? "in" : "out") + '"></span>' + c.name;
+      grid.appendChild(item);
+    });
+    section.appendChild(grid);
+    el.appendChild(section);
+  });
+
+  const summary = document.createElement("div");
+  summary.style.cssText = "margin-top:0.75rem;font-size:0.82rem;color:var(--muted);border-top:1px solid var(--border);padding-top:0.75rem;";
+  summary.textContent = totalIn + " of " + choristers.length + " present";
+  el.appendChild(summary);
+}
+
+// SESSION NOTE
+async function saveNote() {
+  const btn = document.getElementById("note-save-btn");
+  const notes = document.getElementById("note-input").value;
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+  try {
+    await fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "session_note", notes: notes })
+    });
+    const saved = document.getElementById("note-saved");
+    saved.style.display = "block";
+    setTimeout(() => { saved.style.display = "none"; }, 2000);
+  } catch (e) {
+    alert("Could not save note.");
+  }
+  btn.disabled = false;
+  btn.textContent = "Save";
+}
+
+// HISTORY
+async function loadHistory() {
+  const date = document.getElementById("hist-date").value;
+  const vp = document.getElementById("hist-vp").value;
+  if (!date) return;
+  const histBody = document.getElementById("hist-body");
+  histBody.innerHTML = '<div class="loading-msg">Loading...</div>';
+  document.getElementById("hist-note-display").style.display = "none";
+
+  try {
+    const [logRes, noteRes] = await Promise.all([
+      fetch(CONFIG.API_URL + "?action=log&date=" + date),
+      fetch(CONFIG.API_URL + "?action=session&date=" + date)
+    ]);
+    historyRows = await logRes.json();
+    const noteData = await noteRes.json();
+
+    if (noteData.notes) {
+      const nd = document.getElementById("hist-note-display");
+      nd.textContent = "Note: " + noteData.notes;
+      nd.style.display = "block";
+    }
+
+    const filtered = vp ? historyRows.filter(r => r.voice_part === vp) : historyRows;
+
+    if (!filtered.length) {
+      histBody.innerHTML = '<div class="empty-msg">No entries for this date.</div>';
+      return;
+    }
+
+    const table = document.createElement("table");
+    table.innerHTML = '<thead><tr><th>Time</th><th>Name</th><th>Voice part</th><th>Action</th><th>Late</th></tr></thead>';
+    const tbody = document.createElement("tbody");
+    filtered.forEach(r => {
+      const tr = document.createElement("tr");
+      const t = new Date(r.timestamp);
+      const time = t.toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit" });
+      tr.innerHTML =
+        '<td>' + time + '</td>' +
+        '<td>' + r.name + '</td>' +
+        '<td>' + (VOICE_NAMES[r.voice_part] || r.voice_part) + '</td>' +
+        '<td><span class="badge ' + r.checkinAction + '">' + (r.checkinAction === "in" ? "Signed in" : "Signed out") + '</span></td>' +
+        '<td>' + (r.late === true || r.late === "TRUE" ? '<span class="badge late">Late</span>' : '') + '</td>';
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    histBody.innerHTML = "";
+    histBody.appendChild(table);
+  } catch (e) {
+    histBody.innerHTML = '<div class="empty-msg">Could not load history.</div>';
+  }
+}
+
+// EXPORT CSV
+function exportCSV() {
+  if (!historyRows.length) { alert("Load a date first."); return; }
+  const rows = [["Timestamp","Name","Voice Part","Action","Late"]];
+  historyRows.forEach(r => {
+    rows.push([r.timestamp, r.name, r.voice_part, r.checkinAction, r.late ? "Yes" : "No"]);
+  });
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  a.download = "choir-attendance-" + document.getElementById("hist-date").value + ".csv";
+  a.click();
+}
+</script>
+</body>
+</html>
