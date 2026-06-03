@@ -252,16 +252,13 @@ async function doConfirm(confirmed) {
   const newAction = currentMode === "in" ? "in" : "out";
 
   try {
-    const res = await fetch(CONFIG.API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "checkin",
-        name: chorister.name,
-        voice_part: chorister.voice_part,
-        checkinAction: newAction
-      })
+    const params = new URLSearchParams({
+      action: "checkin",
+      name: chorister.name,
+      voice_part: chorister.voice_part,
+      checkinAction: newAction
     });
+    const res = await fetch(CONFIG.API_URL + "?" + params.toString());
     const data = await res.json();
     if (data.success) {
       statusMap[chorister.name] = newAction;
