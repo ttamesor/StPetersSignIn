@@ -295,7 +295,7 @@ statusMap[chorister.name] = newAction;
       const first = chorister.name.split(" ")[0];
       document.getElementById("done-name").textContent = "Thank you, " + first + "!";
       showScreen("screen-done");
-      setTimeout(() => showHome(), 1500);
+      setTimeout(() => showHome(), 1200);
     } else {
       showError("Something went wrong. Please try again.");
       showHome();
