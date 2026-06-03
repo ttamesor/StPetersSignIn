@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Choir Register - Admin</title>
+<link rel="icon" href="StPeterFavicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -164,7 +165,7 @@
 
 <div class="login-wrap" id="login-screen">
   <div class="login-box">
-    <img src="Graphic_-_Master.png" alt="Choir crest">
+    <img src="GraphicMaster.png" alt="Choir crest">
     <h2>Admin Access</h2>
     <p>Choir Register</p>
     <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
@@ -176,7 +177,7 @@
 <div id="admin-screen" style="display:none;">
   <header>
     <div class="header-left">
-      <img src="Graphic_-_Master.png" alt="Choir crest">
+      <img src="GraphicMaster.png" alt="Choir crest">
       <div class="header-text">
         <h1>Choir Register - Admin</h1>
         <div class="subtitle" id="hdr-date"></div>
@@ -281,7 +282,7 @@ async function initAdmin() {
     if (sessionData.notes) document.getElementById("note-input").value = sessionData.notes;
   } catch (e) {
     document.getElementById("presence-body").innerHTML =
-      '<div class="empty-msg">Could not load data. Check API_URL in config.js.</div>';
+      '<div class="empty-msg">Could not load data.</div>';
   }
 }
 
@@ -290,12 +291,10 @@ function renderPresence(statusList) {
   el.innerHTML = "";
   const map = {};
   statusList.forEach(s => { map[s.name] = s.status; });
-
   const sorted = choristers.slice().sort((a,b) => a.name.localeCompare(b.name));
   const grid = document.createElement("div");
   grid.className = "presence-grid";
   let totalIn = 0;
-
   sorted.forEach(c => {
     const isIn = (map[c.name] || "out") === "in";
     if (isIn) totalIn++;
@@ -304,7 +303,6 @@ function renderPresence(statusList) {
     item.innerHTML = '<span class="presence-dot ' + (isIn ? "in" : "out") + '"></span>' + c.name;
     grid.appendChild(item);
   });
-
   el.appendChild(grid);
   const summary = document.createElement("div");
   summary.className = "presence-summary";
@@ -378,9 +376,9 @@ async function loadHistory() {
 
 function exportCSV() {
   if (!historyRows.length) { alert("Load a date first."); return; }
-  const rows = [["Timestamp","Name","Voice Part","Action","Late"]];
+  const rows = [["Timestamp","Name","Action","Late"]];
   historyRows.forEach(r => {
-    rows.push([r.timestamp, r.name, r.voice_part, r.checkinAction, r.late ? "Yes" : "No"]);
+    rows.push([r.timestamp, r.name, r.checkinAction, r.late ? "Yes" : "No"]);
   });
   const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(",")).join("\n");
   const a = document.createElement("a");
