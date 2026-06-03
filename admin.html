@@ -314,11 +314,11 @@ async function saveNote() {
   const btn = document.getElementById("note-save-btn");
   btn.disabled = true; btn.textContent = "Saving...";
   try {
-    await fetch(CONFIG.API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "session_note", notes: document.getElementById("note-input").value })
+    const params = new URLSearchParams({
+      action: "sessionnote",
+      notes: document.getElementById("note-input").value
     });
+    await fetch(CONFIG.API_URL + "?" + params.toString());
     const saved = document.getElementById("note-saved");
     saved.style.display = "block";
     setTimeout(() => { saved.style.display = "none"; }, 2000);
