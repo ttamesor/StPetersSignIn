@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Choir Register</title>
 <link rel="icon" href="StPeterFavicon.png">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --red: #8b1a1a;
@@ -37,18 +37,11 @@
   .screen.active { display: block; }
 
   /* HOME */
-  #screen-home { display: flex; flex-direction: column; gap: 1rem; }
-  #screen-home.active { display: flex; }
+  #screen-home.active { display: flex; flex-direction: column; gap: 1rem; }
   .mode-btn {
-    width: 100%;
-    padding: 1.25rem;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.15s;
+    width: 100%; padding: 1.25rem; border: none; border-radius: 8px;
+    font-family: 'Roboto', sans-serif; font-size: 1.2rem; font-weight: 700;
+    cursor: pointer; transition: opacity 0.15s;
   }
   .mode-btn:hover { opacity: 0.88; }
   .mode-btn.signin  { background: var(--green); color: #fff; }
@@ -64,8 +57,7 @@
   .back-btn:hover { color: var(--text); }
   .list-heading {
     font-size: 0.78rem; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.08em;
-    margin-bottom: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;
   }
   .names-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .name-btn {
@@ -81,36 +73,67 @@
   .name-btn.signout-mode:hover { background: var(--red-light);   border-left-color: var(--red);   color: var(--red);   font-weight: 500; }
   .empty-msg { padding: 1.25rem; font-size: 0.9rem; color: var(--muted); font-style: italic; }
 
-  /* CONFIRM */
-  #screen-confirm.active { display: flex; flex-direction: column; align-items: center; }
-  .confirm-label {
-    font-size: 0.82rem; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
+  /* CONFIRM - full screen takeover */
+  #screen-confirm {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: #fff;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
     text-align: center;
   }
+  #screen-confirm.active { display: flex; }
+
+  .confirm-action {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
   .confirm-name {
-    font-size: 1.6rem; font-weight: 700; text-align: center;
-    margin-bottom: 2rem;
+    font-size: 3rem;
+    font-weight: 900;
     color: var(--text);
+    line-height: 1.1;
+    margin-bottom: 3rem;
   }
-  .confirm-btns { display: flex; gap: 1.5rem; }
+  .confirm-btns {
+    display: flex;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 400px;
+  }
   .confirm-btn {
-    width: 90px; height: 90px; border-radius: 50%; border: none;
-    font-size: 2.5rem; cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
+    flex: 1;
+    padding: 1.25rem;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
     transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: 0.02em;
   }
-  .confirm-btn:hover  { opacity: 0.88; }
-  .confirm-btn:active { transform: scale(0.95); }
-  .confirm-btn.tick { background: var(--green); color: #fff; }
-  .confirm-btn.cross { background: #e0e0e0; color: var(--muted); }
-  .confirm-btn:disabled { opacity: 0.4; pointer-events: none; }
-  .confirm-hint {
-    margin-top: 1.5rem; font-size: 0.78rem; color: var(--muted);
-    display: flex; gap: 2.5rem; text-align: center;
+  .confirm-btn:hover  { opacity: 0.9; }
+  .confirm-btn:active { transform: scale(0.97); }
+  .confirm-btn:disabled { opacity: 0.35; pointer-events: none; }
+  .confirm-btn .btn-icon {
+    font-size: 2.2rem;
+    line-height: 1;
   }
-  .confirm-hint span { width: 90px; }
+  .confirm-btn.tick  { background: var(--green); color: #fff; }
+  .confirm-btn.cross { background: #eeeeee; color: #555; }
 
   .loading-msg { text-align: center; padding: 3rem 0; color: var(--muted); font-size: 0.9rem; }
 
@@ -154,21 +177,23 @@
     <div class="list-heading" id="list-heading"></div>
     <div class="names-card" id="names-card"></div>
   </div>
-
-  <!-- CONFIRM -->
-  <div id="screen-confirm" class="screen">
-    <div class="confirm-label" id="confirm-label"></div>
-    <div class="confirm-name" id="confirm-name"></div>
-    <div class="confirm-btns">
-      <button class="confirm-btn tick"  id="btn-tick"  onclick="doConfirm(true)"  aria-label="Confirm">&#10003;</button>
-      <button class="confirm-btn cross" id="btn-cross" onclick="doConfirm(false)" aria-label="Cancel">&#10005;</button>
-    </div>
-    <div class="confirm-hint">
-      <span>Confirm</span>
-      <span>Cancel</span>
-    </div>
-  </div>
 </main>
+
+<!-- CONFIRM - outside main, full screen -->
+<div id="screen-confirm" class="screen">
+  <div class="confirm-action" id="confirm-label"></div>
+  <div class="confirm-name"   id="confirm-name"></div>
+  <div class="confirm-btns">
+    <button class="confirm-btn tick"  id="btn-tick"  onclick="doConfirm(true)">
+      <span class="btn-icon">&#10003;</span>
+      Confirm
+    </button>
+    <button class="confirm-btn cross" id="btn-cross" onclick="doConfirm(false)">
+      <span class="btn-icon">&#10005;</span>
+      Cancel
+    </button>
+  </div>
+</div>
 
 <a href="admin.html" class="admin-link">Admin</a>
 
@@ -202,7 +227,7 @@ function showList(mode) {
 function showConfirm(chorister) {
   pendingChorister = chorister;
   document.getElementById("confirm-label").textContent =
-    currentMode === "in" ? "Sign in as..." : "Sign out as...";
+    currentMode === "in" ? "Signing in as" : "Signing out as";
   document.getElementById("confirm-name").textContent = chorister.name;
   document.getElementById("btn-tick").disabled = false;
   document.getElementById("btn-cross").disabled = false;
