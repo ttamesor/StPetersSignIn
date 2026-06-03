@@ -31,18 +31,14 @@
   .header-text h1 { font-size: 1.2rem; font-weight: 700; color: var(--red); }
   .header-text .subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 1px; }
 
-  main {
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-  }
+  main { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
 
-  /* MODE SELECT */
-  #mode-screen {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* HOME */
+  #screen-home { display: flex; flex-direction: column; gap: 1rem; }
+  #screen-home.active { display: flex; }
   .mode-btn {
     width: 100%;
     padding: 1.25rem;
@@ -54,104 +50,82 @@
     cursor: pointer;
     transition: opacity 0.15s;
   }
-  .mode-btn:hover { opacity: 0.9; }
+  .mode-btn:hover { opacity: 0.88; }
   .mode-btn.signin  { background: var(--green); color: #fff; }
   .mode-btn.signout { background: var(--red);   color: #fff; }
 
-  /* NAME LIST */
-  #list-screen { display: none; }
+  /* LIST */
   .back-btn {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: 'Roboto', sans-serif;
-    font-size: 0.88rem;
-    cursor: pointer;
-    padding: 0 0 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
+    background: none; border: none; color: var(--muted);
+    font-family: 'Roboto', sans-serif; font-size: 0.88rem;
+    cursor: pointer; padding: 0 0 1rem;
+    display: flex; align-items: center; gap: 0.3rem;
   }
   .back-btn:hover { color: var(--text); }
   .list-heading {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 0.78rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
     margin-bottom: 0.75rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.78rem;
   }
-  .names-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
+  .names-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .name-btn {
-    display: block;
-    width: 100%;
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-    padding: 0.85rem 1.25rem;
-    font-family: 'Roboto', sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    color: var(--text);
-    cursor: pointer;
-    border-left: 4px solid transparent;
+    display: block; width: 100%; background: none;
+    border: none; border-bottom: 1px solid var(--border);
+    text-align: left; padding: 0.85rem 1.25rem;
+    font-family: 'Roboto', sans-serif; font-size: 1rem; font-weight: 400;
+    color: var(--text); cursor: pointer; border-left: 4px solid transparent;
     transition: background 0.1s;
   }
   .name-btn:last-child { border-bottom: none; }
   .name-btn.signin-mode:hover  { background: var(--green-light); border-left-color: var(--green); color: var(--green); font-weight: 500; }
   .name-btn.signout-mode:hover { background: var(--red-light);   border-left-color: var(--red);   color: var(--red);   font-weight: 500; }
-  .name-btn.busy { opacity: 0.4; pointer-events: none; }
   .empty-msg { padding: 1.25rem; font-size: 0.9rem; color: var(--muted); font-style: italic; }
+
+  /* CONFIRM */
+  #screen-confirm.active { display: flex; flex-direction: column; align-items: center; }
+  .confirm-label {
+    font-size: 0.82rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  .confirm-name {
+    font-size: 1.6rem; font-weight: 700; text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text);
+  }
+  .confirm-btns { display: flex; gap: 1.5rem; }
+  .confirm-btn {
+    width: 90px; height: 90px; border-radius: 50%; border: none;
+    font-size: 2.5rem; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .confirm-btn:hover  { opacity: 0.88; }
+  .confirm-btn:active { transform: scale(0.95); }
+  .confirm-btn.tick { background: var(--green); color: #fff; }
+  .confirm-btn.cross { background: #e0e0e0; color: var(--muted); }
+  .confirm-btn:disabled { opacity: 0.4; pointer-events: none; }
+  .confirm-hint {
+    margin-top: 1.5rem; font-size: 0.78rem; color: var(--muted);
+    display: flex; gap: 2.5rem; text-align: center;
+  }
+  .confirm-hint span { width: 90px; }
 
   .loading-msg { text-align: center; padding: 3rem 0; color: var(--muted); font-size: 0.9rem; }
 
-  .toast {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--text);
-    color: #fff;
-    padding: 0.55rem 1.2rem;
-    border-radius: 4px;
-    font-size: 0.88rem;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-    white-space: nowrap;
-    z-index: 100;
+  .error-box {
+    background: #fff3f3; border: 1px solid #f5c6c6;
+    color: var(--red); padding: 0.9rem 1.25rem;
+    border-radius: 6px; font-size: 0.88rem; margin-bottom: 1rem;
   }
-  .toast.late { background: #b94a00; }
-  .toast.show { opacity: 1; }
 
   .admin-link {
-    position: fixed;
-    bottom: 1.25rem;
-    right: 1.25rem;
-    font-size: 0.72rem;
-    color: var(--muted);
-    text-decoration: none;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    position: fixed; bottom: 1.25rem; right: 1.25rem;
+    font-size: 0.72rem; color: var(--muted); text-decoration: none;
+    letter-spacing: 0.06em; text-transform: uppercase;
   }
   .admin-link:hover { color: var(--red); }
-
-  .error-box {
-    background: #fff3f3;
-    border: 1px solid #f5c6c6;
-    color: var(--red);
-    padding: 0.9rem 1.25rem;
-    border-radius: 6px;
-    font-size: 0.88rem;
-    margin-bottom: 1rem;
-  }
 </style>
 </head>
 <body>
@@ -168,19 +142,34 @@
   <div id="error-area"></div>
   <div class="loading-msg" id="loading">Loading...</div>
 
-  <div id="mode-screen">
+  <!-- HOME -->
+  <div id="screen-home" class="screen">
     <button class="mode-btn signin"  onclick="showList('in')">Sign In</button>
     <button class="mode-btn signout" onclick="showList('out')">Sign Out</button>
   </div>
 
-  <div id="list-screen">
-    <button class="back-btn" onclick="showMode()">&#8592; Back</button>
+  <!-- LIST -->
+  <div id="screen-list" class="screen">
+    <button class="back-btn" onclick="showHome()">&#8592; Back</button>
     <div class="list-heading" id="list-heading"></div>
     <div class="names-card" id="names-card"></div>
   </div>
+
+  <!-- CONFIRM -->
+  <div id="screen-confirm" class="screen">
+    <div class="confirm-label" id="confirm-label"></div>
+    <div class="confirm-name" id="confirm-name"></div>
+    <div class="confirm-btns">
+      <button class="confirm-btn tick"  id="btn-tick"  onclick="doConfirm(true)"  aria-label="Confirm">&#10003;</button>
+      <button class="confirm-btn cross" id="btn-cross" onclick="doConfirm(false)" aria-label="Cancel">&#10005;</button>
+    </div>
+    <div class="confirm-hint">
+      <span>Confirm</span>
+      <span>Cancel</span>
+    </div>
+  </div>
 </main>
 
-<div class="toast" id="toast"></div>
 <a href="admin.html" class="admin-link">Admin</a>
 
 <script src="config.js"></script>
@@ -188,32 +177,36 @@
 let choristers = [];
 let statusMap = {};
 let currentMode = null;
+let pendingChorister = null;
 
 document.getElementById("hdr-date").textContent =
   new Date().toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
 
-function showError(msg) {
-  document.getElementById("error-area").innerHTML = '<div class="error-box">' + msg + '</div>';
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
-function showToast(msg, late) {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.className = "toast" + (late ? " late" : "") + " show";
-  setTimeout(() => { el.className = "toast" + (late ? " late" : ""); }, 2500);
-}
-
-function showMode() {
-  document.getElementById("list-screen").style.display = "none";
-  document.getElementById("mode-screen").style.display = "flex";
+function showHome() {
   currentMode = null;
+  pendingChorister = null;
+  showScreen("screen-home");
 }
 
 function showList(mode) {
   currentMode = mode;
-  document.getElementById("mode-screen").style.display = "none";
-  document.getElementById("list-screen").style.display = "block";
   renderList();
+  showScreen("screen-list");
+}
+
+function showConfirm(chorister) {
+  pendingChorister = chorister;
+  document.getElementById("confirm-label").textContent =
+    currentMode === "in" ? "Sign in as..." : "Sign out as...";
+  document.getElementById("confirm-name").textContent = chorister.name;
+  document.getElementById("btn-tick").disabled = false;
+  document.getElementById("btn-cross").disabled = false;
+  showScreen("screen-confirm");
 }
 
 function renderList() {
@@ -221,40 +214,43 @@ function renderList() {
   const heading = document.getElementById("list-heading");
   card.innerHTML = "";
 
-  if (currentMode === "in") {
-    heading.textContent = "Who's signing in?";
-    const people = choristers
-      .filter(c => (statusMap[c.name] || "out") === "out")
-      .sort((a,b) => a.name.localeCompare(b.name));
-    if (!people.length) {
-      card.innerHTML = '<div class="empty-msg">Everyone is already signed in.</div>';
-    } else {
-      people.forEach(c => card.appendChild(makeBtn(c, "signin-mode")));
-    }
-  } else {
-    heading.textContent = "Who's signing out?";
-    const people = choristers
-      .filter(c => statusMap[c.name] === "in")
-      .sort((a,b) => a.name.localeCompare(b.name));
-    if (!people.length) {
-      card.innerHTML = '<div class="empty-msg">Nobody is currently signed in.</div>';
-    } else {
-      people.forEach(c => card.appendChild(makeBtn(c, "signout-mode")));
-    }
+  const modeClass = currentMode === "in" ? "signin-mode" : "signout-mode";
+  const people = choristers
+    .filter(c => currentMode === "in"
+      ? (statusMap[c.name] || "out") === "out"
+      : statusMap[c.name] === "in")
+    .sort((a,b) => a.name.localeCompare(b.name));
+
+  heading.textContent = currentMode === "in" ? "Who's signing in?" : "Who's signing out?";
+
+  if (!people.length) {
+    card.innerHTML = '<div class="empty-msg">' +
+      (currentMode === "in" ? "Everyone is already signed in." : "Nobody is currently signed in.") +
+      '</div>';
+    return;
   }
+
+  people.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "name-btn " + modeClass;
+    btn.textContent = c.name;
+    btn.addEventListener("click", () => showConfirm(c));
+    card.appendChild(btn);
+  });
 }
 
-function makeBtn(c, modeClass) {
-  const btn = document.createElement("button");
-  btn.className = "name-btn " + modeClass;
-  btn.textContent = c.name;
-  btn.addEventListener("click", () => toggle(c, btn));
-  return btn;
-}
+async function doConfirm(confirmed) {
+  if (!confirmed) {
+    showList(currentMode);
+    return;
+  }
 
-async function toggle(chorister, btn) {
-  btn.classList.add("busy");
+  document.getElementById("btn-tick").disabled = true;
+  document.getElementById("btn-cross").disabled = true;
+
+  const chorister = pendingChorister;
   const newAction = currentMode === "in" ? "in" : "out";
+
   try {
     const res = await fetch(CONFIG.API_URL, {
       method: "POST",
@@ -269,21 +265,21 @@ async function toggle(chorister, btn) {
     const data = await res.json();
     if (data.success) {
       statusMap[chorister.name] = newAction;
-      const first = chorister.name.split(" ")[0];
-      if (newAction === "in") {
-        showToast(first + (data.late ? " signed in (late)" : " signed in"), data.late);
-      } else {
-        showToast(first + " signed out", false);
-      }
-      renderList();
+      showHome();
     } else {
       showError("Something went wrong. Please try again.");
-      btn.classList.remove("busy");
+      showHome();
     }
   } catch (e) {
     showError("Could not save. Check your connection.");
-    btn.classList.remove("busy");
+    showHome();
   }
+}
+
+function showError(msg) {
+  const el = document.getElementById("error-area");
+  el.innerHTML = '<div class="error-box">' + msg + '</div>';
+  setTimeout(() => { el.innerHTML = ""; }, 4000);
 }
 
 async function init() {
@@ -296,16 +292,12 @@ async function init() {
     const today = await sRes.json();
     today.forEach(s => { statusMap[s.name] = s.status; });
     document.getElementById("loading").style.display = "none";
-    document.getElementById("mode-screen").style.display = "flex";
+    showHome();
   } catch (e) {
     document.getElementById("loading").style.display = "none";
     showError("Could not load register. Check CONFIG.API_URL in config.js.");
   }
 }
-
-// hide both screens until loaded
-document.getElementById("mode-screen").style.display = "none";
-document.getElementById("list-screen").style.display = "none";
 
 init();
 </script>
