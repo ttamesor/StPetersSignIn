@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choir Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #8b1a1a;
+    --red-light: #f7eeee;
+    --border: #e0e0e0;
+    --text: #1a1a1a;
+    --muted: #757575;
+    --green: #2e7d32;
+    --green-light: #f1f8f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: #f5f5f5;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: #fff;
+    border-bottom: 2px solid var(--red);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  header img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+  }
+  .header-text h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--red);
+    letter-spacing: 0.01em;
+  }
+  .header-text .subtitle {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 1px;
+  }
+
+  .tally-bar {
+    background: var(--red);
+    padding: 0.45rem 1.5rem;
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .tally-item {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.78rem;
+    font-weight: 400;
+  }
+  .tally-item strong {
+    color: #fff;
+    font-weight: 700;
+    margin-right: 0.2rem;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 4rem 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    max-width: 960px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+
+  .col {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 0;
+  }
+  .col:first-child { border-radius: 8px 0 0 8px; border-right: none; }
+  .col:last-child  { border-radius: 0 8px 8px 0; }
+
+  .col-header {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .col-header.sign-in  { color: var(--green); }
+  .col-header.sign-out { color: var(--red); }
+  .col-header .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .col-header.sign-in  .dot { background: var(--green); }
+  .col-header.sign-out .dot { background: var(--red); }
+
+  .col-body { padding: 0.5rem 0; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.6rem 1.25rem 0.25rem;
+  }
+
+  .name-btn {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 0.6rem 1.25rem;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 400;
+    color: var(--text);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .name-btn:hover {
+    background: #f5f5f5;
+  }
+  .col:first-child .name-btn:hover {
+    background: var(--green-light);
+    border-left-color: var(--green);
+    color: var(--green);
+    font-weight: 500;
+  }
+  .col:last-child .name-btn:hover {
+    background: var(--red-light);
+    border-left-color: var(--red);
+    color: var(--red);
+    font-weight: 500;
+  }
+  .name-btn.busy { opacity: 0.4; pointer-events: none; }
+
+  .empty-msg {
+    padding: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: #fff;
+    padding: 0.55rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+  }
+  .toast.late { background: #b94a00; }
+  .toast.show { opacity: 1; }
+
+  .admin-link {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: 'Roboto', sans-serif;
+  }
+  .admin-link:hover { color: var(--red); }
+
+  .error-box {
+    background: #fff3f3;
+    border: 1px solid #f5c6c6;
+    color: var(--red);
+    padding: 0.9rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    margin: 1rem;
+  }
+
+  @media (max-width: 560px) {
+    .columns { grid-template-columns: 1fr; padding: 0 0.75rem; }
+    .col:first-child { border-radius: 8px 8px 0 0; border-right: 1px solid var(--border); border-bottom: none; }
+    .col:last-child  { border-radius: 0 0 8px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="Graphic_-_Master.png" alt="Choir crest">
+  <div class="header-text">
+    <h1>Choir Register</h1>
+    <div class="subtitle" id="hdr-date"></div>
+  </div>
+</header>
+
+<div class="tally-bar">
+  <span class="tally-item"><strong id="t-s">0</strong>S</span>
+  <span class="tally-item"><strong id="t-a">0</strong>A</span>
+  <span class="tally-item"><strong id="t-t">0</strong>T</span>
+  <span class="tally-item"><strong id="t-b">0</strong>B</span>
+  <span class="tally-item"><strong id="t-total">0</strong>present</span>
+</div>
+
+<div style="max-width:960px;margin:0 auto;padding:0 1rem;">
+  <div class="loading" id="loading">Loading register...</div>
+  <div id="error-area"></div>
+</div>
+
+<div class="columns" id="columns" style="display:none;">
+  <div class="col" id="col-in">
+    <div class="col-header sign-in"><span class="dot"></span>Sign In</div>
+    <div class="col-body" id="list-in"></div>
+  </div>
+  <div class="col" id="col-out">
+    <div class="col-header sign-out"><span class="dot"></span>Sign Out</div>
+    <div class="col-body" id="list-out"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<a href="admin.html" class="admin-link">Admin</a>
+
+<script src="config.js"></script>
+<script>
+const VOICE_ORDER = ["S","A","T","B"];
+const VOICE_NAMES = { S:"Soprano", A:"Alto", T:"Tenor", B:"Bass" };
+
+let choristers = [];
+let statusMap = {};
+
+function displayDate(d) {
+  return d.toLocaleDateString("en-GB", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+}
+document.getElementById("hdr-date").textContent = displayDate(new Date());
+
+function updateTally() {
+  const counts = { S:0, A:0, T:0, B:0 };
+  let total = 0;
+  choristers.forEach(c => {
+    if (statusMap[c.name] === "in") {
+      if (counts[c.voice_part] !== undefined) { counts[c.voice_part]++; total++; }
+    }
+  });
+  ["s","a","t","b"].forEach((k,i) => {
+    document.getElementById("t-"+k).textContent = counts[["S","A","T","B"][i]];
+  });
+  document.getElementById("t-total").textContent = total;
+}
+
+function showToast(msg, late) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast" + (late ? " late" : "") + " show";
+  setTimeout(() => { el.className = "toast" + (late ? " late" : ""); }, 2500);
+}
+
+function showError(msg) {
+  document.getElementById("error-area").innerHTML = '<div class="error-box">' + msg + '</div>';
+}
+
+function renderLists() {
+  const inEl  = document.getElementById("list-in");
+  const outEl = document.getElementById("list-out");
+  inEl.innerHTML = "";
+  outEl.innerHTML = "";
+
+  const out = choristers.filter(c => (statusMap[c.name] || "out") === "out");
+  const inn = choristers.filter(c => statusMap[c.name] === "in");
+
+  function renderGroup(people, container, action) {
+    if (!people.length) {
+      container.innerHTML = '<div class="empty-msg">' +
+        (action === "in" ? "Everyone is signed in." : "Nobody signed in yet.") +
+        '</div>';
+      return;
+    }
+    VOICE_ORDER.forEach(vp => {
+      const group = people.filter(c => c.voice_part === vp);
+      if (!group.length) return;
+      const label = document.createElement("div");
+      label.className = "section-label";
+      label.textContent = VOICE_NAMES[vp];
+      container.appendChild(label);
+      group.forEach(c => {
+        const btn = document.createElement("button");
+        btn.className = "name-btn";
+        btn.textContent = c.name;
+        btn.addEventListener("click", () => toggle(c, btn));
+        container.appendChild(btn);
+      });
+    });
+  }
+
+  renderGroup(out, inEl,  "in");
+  renderGroup(inn, outEl, "out");
+}
+
+async function toggle(chorister, btn) {
+  btn.classList.add("busy");
+  const current = statusMap[chorister.name] || "out";
+  const newAction = current === "in" ? "out" : "in";
+  try {
+    const res = await fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "checkin",
+        name: chorister.name,
+        voice_part: chorister.voice_part,
+        checkinAction: newAction
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      statusMap[chorister.name] = newAction;
+      updateTally();
+      renderLists();
+      const first = chorister.name.split(" ")[0];
+      if (newAction === "in") {
+        showToast(first + (data.late ? " signed in (late)" : " signed in"), data.late);
+      } else {
+        showToast(first + " signed out", false);
+      }
+    } else {
+      showError("Something went wrong. Please try again.");
+      btn.classList.remove("busy");
+    }
+  } catch (e) {
+    showError("Could not save. Check your connection.");
+    btn.classList.remove("busy");
+  }
+}
+
+async function init() {
+  try {
+    const [cRes, sRes] = await Promise.all([
+      fetch(CONFIG.API_URL + "?action=choristers"),
+      fetch(CONFIG.API_URL + "?action=today")
+    ]);
+    choristers = await cRes.json();
+    const today = await sRes.json();
+    today.forEach(s => { statusMap[s.name] = s.status; });
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("columns").style.display = "grid";
+    renderLists();
+    updateTally();
+  } catch (e) {
+    document.getElementById("loading").style.display = "none";
+    showError("Could not load register. Check CONFIG.API_URL in config.js.");
+  }
+}
+
+init();
+</script>
+</body>
+</html>
